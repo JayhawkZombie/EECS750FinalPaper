@@ -1,0 +1,4 @@
+code/*.o
+code/*.out
+code/driver
+code/acc

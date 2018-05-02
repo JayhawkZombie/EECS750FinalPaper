@@ -1,0 +1,13 @@
+Statistics on New Operation
+	Mean:	0.99998
+	Min:	0.999834
+	Max:	1
+	Variance:	4.45027e-10
+	STDDEV:	2.10957e-05
+
+Statistics on Old Operation
+	Mean:	0.995713
+	Min:	0.852623
+	Max:	1
+	Variance:	1.75579e-05
+	STDDEV:	0.00419022

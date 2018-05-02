@@ -6,7 +6,6 @@ all:
 	bibtex main
 	pdflatex main
 
-
 figs/%.pdf: figs/%.eps
 	epspdf $< 
 
