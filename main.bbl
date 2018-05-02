@@ -1,0 +1,16 @@
+\begin{thebibliography}{1}
+
+\bibitem{banga99resourcecontainers}
+G.~Banga, P.~Druschel, and J.~Mogul.
+\newblock Resource containers: A new facility for resource management in server
+  systems.
+\newblock In {\em Operating Systems Design and Implementation (OSDI)},
+  volume~99, pages 45--58. USENIX, 1999.
+
+\bibitem{barroso2009datacenter}
+A.~Barroso and U.~H{\"o}lzle.
+\newblock The datacenter as a computer: An introduction to the design of
+  warehouse-scale machines.
+\newblock {\em Synthesis Lectures on Computer Architecture}, 4(1):1--108, 2009.
+
+\end{thebibliography}

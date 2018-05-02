@@ -1,0 +1,158 @@
+%
+%  $Author: ienne $
+%  $Date: 1995/09/15 15:20:59 $
+%  $Revision: 1.4 $
+%
+
+% \documentclass[10pt,journal,cspaper,compsoc]{IEEEtran}   %%%tc version
+\documentclass[10pt, conference]{IEEEtran}
+%\documentclass[conference,compsoc]{IEEEtran}
+%\documentclass[10pt, conference]{IEEEtran}
+%\documentclass[times, 10pt,onecolumn]{article}
+\usepackage{amsmath, amssymb, enumerate}
+
+%%%%%%%%%%%%%%%% page control%%%%%%%%%%%%%%%%%
+%\usepackage[margin=0.75in]{geometry}
+
+%\linespread{0.991}  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% this is really useful
+%\usepackage{cite}
+\usepackage{fancybox}
+\usepackage{amsfonts}
+%\usepackage{algorithm}
+%\usepackage[noend]{algorithmic}
+\usepackage[usenames]{color}
+%\usepackage{colortbl}
+%\usepackage[ figure, boxed, vlined]{algorithm2e}
+%\usepackage[linesnumbered,vlined]{algorithm2e}
+%\usepackage[lined,boxed]{algorithm2e}
+\usepackage{listings}
+
+\usepackage[linesnumbered,vlined]{algorithm2e}
+\usepackage{graphicx}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{subfigure}
+\usepackage{caption}
+%\usepackage{subcaption}
+\usepackage{multirow}
+%\usepackage{setspace}
+%\usepackage{listings}
+\usepackage{epsfig}
+%\usepackage{epstopdf}
+%\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{url}
+\usepackage{float}
+
+\usepackage{color}
+\def\fixme#1{\typeout{FIXED in page \thepage : {#1}}
+%\bgroup \color{red}{} \egroup}
+\bgroup \color{red}{[FIXME: {#1}]} \egroup}
+
+
+%\usepackage[pdftex]{hyperref}
+\usepackage{rotating,tabularx}
+
+\interfootnotelinepenalty=10000
+
+%% Define a new 'leo' style for the package that will use a smaller font.
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+
+%\documentstyle[times,art10,twocolumn,latex8]{article}
+
+%-------------------------------------------------------------------------
+% take the % away on next line to produce the final camera-ready version
+\pagestyle{plain}
+%\thispagestyle{empty}
+%\pagestyle{empty}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+
+%% remaining budget share, used in task stall section.
+\newcommand{\bottomrule}{\hline}
+\newcommand{\toprule}{\hline}
+\newcommand{\midrule}{\hline}
+
+%-------------------------------------------------------------------------
+\begin{document}
+
+\title{The Linux Scheduler: Complicatedly Simple Calculations}
+\author{Kurt Slagle, Dustin Hauptman\\
+\{kslagle,dhauptman\}@ku.edu\\
+University of Kansas, USA\\ 
+}
+
+\maketitle
+\thispagestyle{empty}
+\begin{abstract}
+
+\textbf{The Linux scheduler is written to be adaptive, flexible, and customizable.  However, with this modularity comes complexity.  As the kernel cannot easily perform floating point computations, there are present, inside the scheduler's per-task computations, a number of operations that are seemingly overly complex in an attempt to reproduce the floating point operations using fixed-point operations.  This paper looks in-depth at one function called repeatedly inside the kernels Completely Fair Scheduler, and presents a statistical analysis of the values passed to and from this function, as well as the accuracy of the performed computations.}
+
+\end{abstract}
+
+%-------------------------------------------------------------------------
+
+\section{Introduction}
+
+The concept of the Completely Fair Scheduler (CFS) is deceptively simple.  The source code for this inside the Linux kernel appears, initially, far more complex than would seem necessary. For example in Figure 1, the code shown simply calculates the new delta\_exec by multiplying it with the weight and inverted load weight. The purpose of implementing the code in this way is not immediately clear and not elaborated on in detail.
+
+We seek to analyze the benefits gained or loss by implementing the code in this way.
+
+\begin{figure}[h]
+\lstset{language=c}
+\lstset{basicstyle=\small}
+\begin{lstlisting}
+
+static u64 __calc_delta(u64 delta_exec, 
+unsigned long weight, struct load_weight *lw)
+{
+	u64 fact = scale_load_down(weight);
+	int shift = WMULT_SHIFT;
+
+	__update_inv_weight(lw);
+	
+	if (unlikely(fact >> 32)) {
+		while (fact >> 32) {
+			fact >>= 1;
+			shift--;
+		}
+	}
+	
+	/* hint to use a 32x32->64 mul */
+	fact = (u64)(u32)fact * lw->inv_weight;
+	
+	while (fact >> 32) {
+		fact >>= 1;
+		shift--;
+	}
+	
+	return mul_u64_u32_shr(delta_exec, 
+	                       fact, shift);
+}
+
+\end{lstlisting}
+\caption{\_\_calc\_delta inside fair.c}
+\end{figure}
+
+
+\section{Background}
+Cite a paper \cite{barroso2009datacenter}.
+
+Cite multiple papers \cite{banga99resourcecontainers,barroso2009datacenter}
+
+\section{Your System}
+
+
+
+\section{Evaluation}
+...
+\section{Conclusion}
+...
+%-------------------------------------------------------------------------
+
+\bibliographystyle{plain}
+\bibliography{reference}
+\end{document}
