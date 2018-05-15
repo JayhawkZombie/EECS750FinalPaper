@@ -1,33 +1,3 @@
-////////////////////////////////////////////////////////////
-//
-// MIT License
-//
-// Copyright(c) 2018 Dustin Hauptman - dhauptman.dh@gmail.com
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//
-// The origin of this software must not be misrepresented; you must not claim
-// that you wrote the original software.If you use this software in a product,
-// an acknowledgment of the software used is required.
-//
-////////////////////////////////////////////////////////////
-
 #include <stdint.h>
 #include <iostream>
 #include <fstream>
@@ -70,42 +40,42 @@ static inline uint64_t mul_u64_u32_shr(uint64_t a, uint32_t mul, unsigned int sh
 
 static void __update_inv_weight(struct load_weight *lw)
 {
-	unsigned long w;
+  unsigned long w;
 
-	if (lw->inv_weight)
-		return;
+  if (lw->inv_weight)
+  return;
 
-	w = lw->weight >> 10;
+  w = lw->weight >> 10;
 
-	if (BITS_PER_LONG > 32 && w >= WMULT_CONST)
-		lw->inv_weight = 1;
-	else if (!w)
-		lw->inv_weight = WMULT_CONST;
-	else
-		lw->inv_weight = WMULT_CONST / w;
+  if (BITS_PER_LONG > 32 && w >= WMULT_CONST)
+  lw->inv_weight = 1;
+  else if (!w)
+  lw->inv_weight = WMULT_CONST;
+  else
+  lw->inv_weight = WMULT_CONST / w;
 }
 
 static uint64_t Old_Calc(uint64_t delta_exec, unsigned long weight, struct load_weight *lw)
 {
 
-	uint64_t fact = weight >> 10;
-	int shift = 32;
-	__update_inv_weight(lw);
+  uint64_t fact = weight >> 10;
+  int shift = 32;
+  __update_inv_weight(lw);
   if (fact >> 32) { // Why this and not just the while loop?
-		while (fact >> 32) {
-			fact >>= 1;
-			shift--;
-		}
-	}
-	/* hint to use a 32x32->64 mul */
-	fact = (uint64_t)(uint32_t)fact * lw->inv_weight;
-		while (fact >> 32) {
-		fact >>= 1;
-		shift--;
-	}
-	uint64_t val;
-	val =  mul_u64_u32_shr(delta_exec, fact, shift);
-	return val;
+    while (fact >> 32) {
+      fact >>= 1;
+      shift--;
+    }
+  }
+  /* hint to use a 32x32->64 mul */
+  fact = (uint64_t)(uint32_t)fact * lw->inv_weight;
+  while (fact >> 32) {
+    fact >>= 1;
+    shift--;
+  }
+  uint64_t val;
+  val =  mul_u64_u32_shr(delta_exec, fact, shift);
+  return val;
 }
 
 static uint64_t New_calc(uint64_t delta_exec, unsigned long weight, struct load_weight *lw)
@@ -133,6 +103,9 @@ int main() {
 
   std::ofstream percentage_file;
   std::ofstream statistics_file;
+  std::ofstream PercentOneToFive;
+  std::ofstream PercentSixToTen;
+  std::ofstream PercentElevenUp;
 
   // Probably should grab this from an input...nah CTRL-C + CTRL-V
   percentage_file.open("Percentage_out.txt");
@@ -162,6 +135,11 @@ int main() {
     return(-1);
   }
 
+
+  PercentOneToFive.open("Percentage_1_5.txt");
+  PercentSixToTen.open("Percentage_6_10.txt");
+  PercentElevenUp.open("Percentage_11_up.txt");
+
   uint64_t delta_exec_val;
   uint32_t weight_val;
   load_weight lw;
@@ -171,11 +149,9 @@ int main() {
   accumulator_set<double, features<tag::mean, tag::variance, tag::max, tag::min > > acc_new;
   accumulator_set<double, features<tag::mean, tag::variance, tag::max, tag::min > > acc_old;
 
-  // All the files should be the same legnth so just read from 1 until the end of the file
-  while (delta_exec >> delta_exec_val) {
-    weight >> weight_val;
-    lw_weight >> lw.weight;
-    lw_inv_weight >> lw.inv_weight;
+  // All the files should be the same length
+  int count1, count2, count3 = 1;
+  while (delta_exec >> delta_exec_val && weight >> weight_val && lw_weight >> lw.weight && lw_inv_weight >> lw.inv_weight) {
 
     //Calculations
     calc1 = floatCalculation(double(delta_exec_val), float(weight_val), float(lw.weight));
@@ -198,13 +174,48 @@ int main() {
     //File output
     percentage_file << percentage_new << '\t' << percentage_old << '\n';
 
+    //Range Check on the Percentages
+    double inv_percentage_old = 1.0 - percentage_old;
+    if (inv_percentage_old > .01 && inv_percentage_old <= .05)
+    {
+
+      PercentOneToFive << "Instance " << count1 << '\n';
+      PercentOneToFive << "\tInput Values:\n\tDelta Exec Prior: " << delta_exec_val << "\tWeight: " << weight_val << "\tLoad Weight: " << lw.weight << "\tInverted Weight: " << lw.inv_weight << '\n';
+      PercentOneToFive << "\tDelta Execs:\n\tOld: " << calc2 << "\tNew: " << calc3 << "\tFloat: " << calc1 << '\n';
+      PercentOneToFive << "\tPercentages:\n\tOld: " << percentage_old << "\tNew: " << percentage_new << "\n\n";
+      count1++;
+    }
+
+    else if (inv_percentage_old > .05 && inv_percentage_old <= .1)
+    {
+      PercentSixToTen << "Instance " << count2 << '\n';
+      PercentSixToTen << "\tInput Values:\n\t\tDelta Exec Prior: " << delta_exec_val << "\tWeight: " << weight_val << "\tLoad Weight: " << lw.weight << "\tInverted Weight: " << lw.inv_weight << '\n';
+      PercentSixToTen << "\tDelta Execs:\n\t\tOld: " << calc2 << "\tNew: " << calc3 << "\tFloat: " << calc1 << '\n';
+      PercentSixToTen << "\tPercentages:\n\t\tOld: " << percentage_old << "\tNew: " << percentage_new << "\n\n";
+      count2++;
+    }
+
+    else if (inv_percentage_old > .1)
+    {
+      PercentElevenUp << "Instance " << count3 << '\n';
+      PercentElevenUp << "\tInput Values:\n\t\tDelta Exec Prior: " << delta_exec_val << "\tWeight: " << weight_val << "\tLoad Weight: " << lw.weight << "\tInverted Weight: " << lw.inv_weight << '\n';
+      PercentElevenUp << "\tDelta Execs:\n\t\tOld: " << calc2 << "\tNew: " << calc3 << "\tFloat: " << calc1 << '\n';
+      PercentElevenUp << "\tPercentages:\n\t\tOld: " << percentage_old << "\tNew: " << percentage_new << "\n\n";
+      count3++;
+    }
+
+
 
   }
+  std::cout << "Count 1: " << count1 << "\tCount 2: " << count2 << "\tCount 3: " << count3 << "\n";
   //Close da files
   delta_exec.close();
   weight.close();
   lw_weight.close();
   lw_inv_weight.close();
+  PercentOneToFive.close();
+  PercentSixToTen.close();
+  PercentElevenUp.close();
   percentage_file.close();
 
   //Show da statistics
@@ -221,5 +232,6 @@ int main() {
   statistics_file << "\tMax:\t" << max(acc_old) << '\n';
   statistics_file << "\tVariance:\t" << variance(acc_old) << '\n';
   statistics_file << "\tSTDDEV:\t" << sqrt(variance(acc_old)) << '\n';
+  statistics_file.close();
   return 0;
 }
