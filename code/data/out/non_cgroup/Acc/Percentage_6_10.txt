@@ -1,0 +1,64 @@
+Instance 0
+	Input Values:
+		Delta Exec Prior: 51443	Weight: 1048576	Load Weight: 15241	Inverted Weight: 306783378
+	Delta Execs:
+		Old: 3762687	New: 3539262	Float: 3.53926e+06
+	Percentages:
+		Old: 0.940621	New: 1
+
+Instance 1
+	Input Values:
+		Delta Exec Prior: 35614	Weight: 1048576	Load Weight: 4334	Inverted Weight: 1073741823
+	Delta Execs:
+		Old: 9117183	New: 8616517	Float: 8.61652e+06
+	Percentages:
+		Old: 0.945085	New: 1
+
+Instance 2
+	Input Values:
+		Delta Exec Prior: 14164	Weight: 1048576	Load Weight: 8633	Inverted Weight: 536870911
+	Delta Execs:
+		Old: 1812991	New: 1720378	Float: 1.72038e+06
+	Percentages:
+		Old: 0.948917	New: 1
+
+Instance 3
+	Input Values:
+		Delta Exec Prior: 19426	Weight: 1048576	Load Weight: 8633	Inverted Weight: 536870911
+	Delta Execs:
+		Old: 2486527	New: 2359508	Float: 2.35951e+06
+	Percentages:
+		Old: 0.948917	New: 1
+
+Instance 4
+	Input Values:
+		Delta Exec Prior: 2708272	Weight: 1048576	Load Weight: 3353	Inverted Weight: 1431655765
+	Delta Execs:
+		Old: 924423509	New: 846951691	Float: 8.46952e+08
+	Percentages:
+		Old: 0.916194	New: 1
+
+Instance 5
+	Input Values:
+		Delta Exec Prior: 3009	Weight: 1048576	Load Weight: 12218	Inverted Weight: 390451572
+	Delta Execs:
+		Old: 280110	New: 258239	Float: 258239
+	Percentages:
+		Old: 0.92192	New: 1
+
+Instance 6
+	Input Values:
+		Delta Exec Prior: 2923	Weight: 1048576	Load Weight: 15271	Inverted Weight: 306783378
+	Delta Execs:
+		Old: 213796	New: 200706	Float: 200706
+	Percentages:
+		Old: 0.938775	New: 0.999998
+
+Instance 7
+	Input Values:
+		Delta Exec Prior: 2887	Weight: 1048576	Load Weight: 18325	Inverted Weight: 252645135
+	Delta Execs:
+		Old: 173899	New: 165197	Float: 165197
+	Percentages:
+		Old: 0.949961	New: 0.999999
+

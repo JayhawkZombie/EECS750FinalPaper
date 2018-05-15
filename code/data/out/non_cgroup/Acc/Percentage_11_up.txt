@@ -1,0 +1,16 @@
+Instance 1
+	Input Values:
+		Delta Exec Prior: 26210	Weight: 1048576	Load Weight: 6050	Inverted Weight: 858993459
+	Delta Execs:
+		Old: 5367807	New: 4542673	Float: 4.54267e+06
+	Percentages:
+		Old: 0.846281	New: 1
+
+Instance 2
+	Input Values:
+		Delta Exec Prior: 7301	Weight: 1048576	Load Weight: 9175	Inverted Weight: 536870911
+	Delta Execs:
+		Old: 934527	New: 834403	Float: 834404
+	Percentages:
+		Old: 0.892862	New: 0.999999
+

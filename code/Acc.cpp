@@ -111,25 +111,25 @@ int main() {
   percentage_file.open("Percentage_out.txt");
   statistics_file.open("Statistics_out.txt");
 
-  delta_exec.open("out/delta_exec");
+  delta_exec.open("out/cgroup/delta_exec");
   if(!delta_exec) {
     std::cerr << "Unable to open delta_exec\n";
     return(-1);
   }
 
-  weight.open("out/Weight");
+  weight.open("out/cgroup/Weight");
   if(!weight) {
     std::cerr << "Unable to open Weight\n";
     return(-1);
   }
 
-  lw_weight.open("out/Load\ Weight");
+  lw_weight.open("out/cgroup/Load\ Weight");
   if(!lw_weight) {
     std::cerr << "Unable to open lw_weight\n";
     return(-1);
   }
 
-  lw_inv_weight.open("out/Inverted\ Weight");
+  lw_inv_weight.open("out/cgroup/Inverted\ Weight");
   if(!lw_inv_weight) {
     std::cerr << "Unable to open lw_inv_weight\n";
     return(-1);
@@ -150,7 +150,7 @@ int main() {
   accumulator_set<double, features<tag::mean, tag::variance, tag::max, tag::min > > acc_old;
 
   // All the files should be the same length
-  int count1, count2, count3 = 1;
+  int count1 = 1, count2 = 1, count3 = 1;
   while (delta_exec >> delta_exec_val && weight >> weight_val && lw_weight >> lw.weight && lw_inv_weight >> lw.inv_weight) {
 
     //Calculations
