@@ -116,32 +116,49 @@ We hypothesize that this implementation could be simplified if it was assumed it
 \section{Background}
 The Completely Fair Scheduler seeks to be "fair" to all processes running, weighting processes to provide more CPU to those processes with a high priority without starving lower-priority tasks.  Each task maintains a virtual time, which is equivalent to the execution time divided by its weight.  The focus of this paper is on the code inside $\_\_calc\_delta$, namely on the calculation of $delta\_exec * 1 / weight$.  Floating point math cannot be used to simplify this, since floating point operations are disabled in the kernel.  They can be enabled, but doing so would likely only prove to be a detriment to performance.
 
-What can be considered is the removal of the special-case optimizations to improve readability.  $\_\_calc\_delta$ is intended to compute $delta\_exec * 1 / weight$, and the code for this in the default Linux kernel is shown in Figure~\ref{fig:figure1}.  The code shown simply calculates the new $delta\_exec$ by multiplying it with the weight and inverted load weight.  The purpose of implementing it in this way is not immediately clear and not elaborated on in detail.  We seek to analyze the benefits gained or lost by implementing the code in this way.
+What can be considered is the removal of the special-case optimizations to improve readability.  $\_\_calc\_delta$ is intended to compute $delta\_exec * 1 / weight$, and the code for this in the default Linux kernel is shown in Listing~\ref{lst:listing1}.  The code shown simply calculates the new $delta\_exec$ by multiplying it with the weight and inverted load weight.  The purpose of implementing it in this way is not immediately clear and not elaborated on in detail.  We seek to analyze the benefits gained or lost by implementing the code in this way.
 
-\begin{figure}[h]
-	\centering
-	\lstinputlisting{__calc_delta.c}
-	\caption{\_\_calc\_delta in fair.c}
-	\label{fig:figure1}
-\end{figure}
-
-For the aforementioned code, the accuracy of the calculation is determined by tracking the value computed by the kernel and the value computed by using floating point operations in user space.  This will be compared to the accuracy achieved by using a simpler version of the code, seen in Figure~\ref{fig:figure2}.
+For the aforementioned code, the accuracy of the calculation is determined by tracking the value computed by the kernel and the value computed by using floating point operations in user space.  This will be compared to the accuracy achieved by using a simpler version of the code, seen in Listing~\ref{lst:listing2}.
 Because speed is critical inside the scheduler, the time spent inside both versions of the code is compared.  Since the kernel will perform different operations when using cgroups and not using cgroups for processes, the same analysis is done with benchmarks run with and without using cgroups.
 
-The Linux kernel uses a plethora of macros whose values are configuration-dependent, and thus it should not be assumed that the analysis presented here is reflective of how the changes would perform on other system configurations.  The system on which this was tested is a Dell Latitude 5580, with an Intel Core i7 7820HQ @ 2.9 GHz (turbo up to 3.9 GHz), 16GB of DDR4 @ 2400 MHz memory, and 500GB HDD @ 7200 rpm.  To keep the CPU running at a relatively constant rate, dynamic frequency scaling was disabled.
+
+
+\lstinputlisting[caption=\_\_calc\_delta inside fair.c, label=lst:listing1]{__calc_delta.c}
+
+\lstinputlisting[caption=Altered \_\_calc\_delta in fair.c, label=lst:listing2]{__calc_delta_new.c}
 
 \section{Your System}
 
-The simplified form of the code is shown in Figure~\ref{fig:figure2}.
-
-\begin{figure}[h]
-	\centering
-	\lstinputlisting{__calc_delta_new.c}
-	\caption{Altered \_\_calc\_delta in fair.c}
-	\label{fig:figure2}
-\end{figure}
+The Linux kernel uses a plethora of macros whose values are configuration-dependent, and thus it should not be assumed that the analysis presented here is reflective of how the changes would perform on other system configurations.  The system on which this was tested is a Dell Latitude 5580, with an Intel Core i7 7820HQ @ 2.9 GHz (turbo up to 3.9 GHz), 16GB of DDR4 @ 2400 MHz memory, and 500GB HDD @ 7200 rpm.  To keep the CPU running at a relatively constant rate, dynamic frequency scaling was disabled.
 
 \section{Evaluation}
+Once the changes were made in the kernel we needed to see if there was any noticeable performance loss at both the micro and macro level. For the micro level analysis, the number of cycles taken to execute were found using the RTDSC instruction present on Intel chips. The cycles, along with all input and output data, were then printed out using $trace\_printk$.
+ 
+There were two sets of data, one using CGROUPS the other without, that were gathered for both kernel versions using this method. To implement the CGROUPS, six .  Once we obtained the cycle counts and input data we started to analyze both the accuracy of both code versions along with the number of cycles each version takes.
+
+    \begin{center}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{| c |c | c | c | c | c |}
+			\hline
+			& Min & Max & Mean & Variance & STDDEV \\ \hline
+			Old Kernel & 0.846281 & 1 & 0.996221 & 1.20622e-05 & 0.00347307 \\ \hline
+			New Kernel & 0.999685 & 1 & 0.999978 & 4.807e-10 & 2.19249e-05 \\
+			\hline
+	\end{tabular}}
+	\captionof{table}{Accuracy w/o CGROUP} \label{tab:table1}
+\end{center}
+
+\begin{center}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{| c | c | c | c | c | c |}
+			\hline
+			& Min & Max & Mean & Variance & STDDEV \\ \hline
+			Old Kernel & 0.994311 & 1 & 0.997727 & 4.17965e-06 & 0.00204442 \\ \hline
+			New Kernel & 0.99984 & 1 & 1 & 5.17154e-12 & 2.2741e-06 \\
+			\hline
+	\end{tabular}}
+	\captionof{table}{Accuracy w/ CGROUP} \label{tab:table2}
+\end{center}
 ...
 \section{Conclusion}
 ...
