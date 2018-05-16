@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6630 64-bit) (preloaded format=pdflatex 2018.5.1)  15 MAY 2018 20:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6630 64-bit) (preloaded format=pdflatex 2018.5.1)  15 MAY 2018 21:57
 entering extended mode
 **./main.tex
 (main.tex
@@ -527,6 +527,11 @@ Non-PDF special ignored!
 ]
 (__calc_delta_new.c)
 
+Package caption Warning: \captionsetup{type*=...} or \captionof
+(caption)                outside box or environment on input line 152.
+See the caption package documentation for explanation.
+
+
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
 
@@ -537,28 +542,27 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[2
-
-] (main.aux) ) 
+[2] (main.aux) ) 
 Here is how much of TeX's memory you used:
- 7313 strings out of 493305
- 110870 string characters out of 3138875
- 245249 words of memory out of 3000000
- 10732 multiletter control sequences out of 15000+200000
- 36927 words of font info for 82 fonts, out of 3000000 for 9000
+ 7324 strings out of 493305
+ 110973 string characters out of 3138875
+ 244276 words of memory out of 3000000
+ 10742 multiletter control sequences out of 15000+200000
+ 38063 words of font info for 83 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,9n,49p,681b,1220s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/base/8r.enc}<C:/Prog
-ram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program File
-s/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Program Files/MiKTeX 
-2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fonts
-/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
-ublic/amsfonts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/
-utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:/P
-rogram Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb>
-Output written on main.pdf (2 pages, 94111 bytes).
+ 41i,9n,49p,828b,1220s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/base/8r.enc}<C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Fi
+les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
+/public/amsfonts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/time
+s/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:
+/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/Mi
+KTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (2 pages, 104711 bytes).
 PDF statistics:
- 42 PDF objects out of 1000 (max. 8388607)
+ 46 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

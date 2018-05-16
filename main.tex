@@ -132,9 +132,24 @@ Because speed is critical inside the scheduler, the time spent inside both versi
 The Linux kernel uses a plethora of macros whose values are configuration-dependent, and thus it should not be assumed that the analysis presented here is reflective of how the changes would perform on other system configurations.  The system on which this was tested is a Dell Latitude 5580, with an Intel Core i7 7820HQ @ 2.9 GHz (turbo up to 3.9 GHz), 16GB of DDR4 @ 2400 MHz memory, and 500GB HDD @ 7200 rpm.  To keep the CPU running at a relatively constant rate, dynamic frequency scaling was disabled.
 
 \section{Evaluation}
-Once the changes were made in the kernel we needed to see if there was any noticeable performance loss at both the micro and macro level. For the micro level analysis, the number of cycles taken to execute were found using the RTDSC instruction present on Intel chips. The cycles, along with all input and output data, were then printed out using $trace\_printk$.
- 
-There were two sets of data, one using CGROUPS the other without, that were gathered for both kernel versions using this method. To implement the CGROUPS, six .  Once we obtained the cycle counts and input data we started to analyze both the accuracy of both code versions along with the number of cycles each version takes.
+Once the changes were made in the kernel we needed to see if there was any noticeable performance loss at both the micro and macro level. All information that was needed from the function was then printed out using $trace\_printk$.
+
+For the micro level analysis, the number of cycles were found using the RTDSC instruction present on Intel chips.
+
+At the macro level two sets of data, one using CGROUPS and the other without, were gathered for both kernel versions. When implementing the CGROUPS, six $cpu\_hog$ programs (Listing~\ref{lst:listing3}) were run and relegated to a single core. The following hierarchy for the CGROUPS were then used $/cgroup1/cgroup1\_1$, $/cgroup1/cgroup1\_2$, and $/cgroup2$. Each group was then given two $cpu\_hog$ programs. When not using CGROUPS, the benchmark hackbench was used and allowed to run on all cores. The macro level data was used for both accuracy calculations and timing analysis.
+
+Once we obtained the cycle counts and input data we looked at if there were any noticeable slowdowns and if the accuracy had degraded or not.
+
+\subsection{Accuracy}
+When calculating the accuracy of the code in both kernel versions, we are assuming that the "ideal" value that could be calculated is the $delta\_exec * 1 / weight$ using floating point arithmetic. Since floating point operations are disabled in the kernel by default, we reimplemented all necessary kernel functions in user space and compared them against a floating point version of the ideal calculation. The results of this can be seen in both Table~\ref{tab:table1} and Table~\ref{tab:table2}. Not surprising is that our  $\_\_calc\_delta$ closely mirrors the floating point operation, as the same computation will be performed. More surprising is the that the old  $\_\_calc\_delta$ can generate results that are only around 84.63\% accurate, where ours never loose accuracy beyond 99.97\%.
+
+\begin{lstlisting}
+int main(void) {
+	while(1);
+	return;
+}
+\end{lstlisting}
+\captionof{lstlisting}{cpu\_hog program} \label{lst:listing3}
 
     \begin{center}
 	\resizebox{\columnwidth}{!}{%
@@ -158,6 +173,30 @@ There were two sets of data, one using CGROUPS the other without, that were gath
 			\hline
 	\end{tabular}}
 	\captionof{table}{Accuracy w/ CGROUP} \label{tab:table2}
+\end{center}
+
+\begin{center}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{| c | c | c | c | c | c | c |}
+			\hline
+			& Min & Max & Mean & Variance & STDDEV & Count\\ \hline
+			Old Kernel & 19 & 3156 & 72.7423 & 889.85 & 29.8304 & 40427 \\ \hline
+			New Kernel & 22 & 909 & 46.9553 & 378.735 & 19.4611 & 40428 \\
+			\hline
+	\end{tabular}}
+	\captionof{table}{Total Cycles w/o CGROUP} \label{tab:table3}
+\end{center}
+
+\begin{center}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{| c | c | c | c | c | c | c |}
+			\hline
+			& Min & Max & Mean & Variance & STDDEV & Count \\ \hline
+			Old Kernel & 18 & 4295 & 75.1081 & 2854.71 & 53.4295 & 77997 \\ \hline
+			New Kernel & 19 & 1642 & 37.9399 & 964.117 & 31.0502 & 77997 \\
+			\hline
+	\end{tabular}}
+	\captionof{table}{Total Cycles w/ CGROUP} \label{tab:table4}
 \end{center}
 ...
 \section{Conclusion}
