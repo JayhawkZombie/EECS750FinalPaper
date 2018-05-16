@@ -141,13 +141,13 @@ At the macro level two sets of data, one using CGROUPS and the other without, we
 Once we obtained the cycle counts and input data we looked at if there were any noticeable slowdowns and if the accuracy had degraded or not.
 
 \subsection{Accuracy}
-When calculating the accuracy of the code in both kernel versions, we are assuming that the "ideal" value that could be calculated is the $delta\_exec * 1 / weight$ using floating point arithmetic. Since floating point operations are disabled in the kernel by default, we reimplemented all necessary kernel functions in user space and compared them against a floating point version of the ideal calculation. The results of this can be seen in both Table~\ref{tab:table1} and Table~\ref{tab:table2}. Not surprising is that our  $\_\_calc\_delta$ closely mirrors the floating point operation, as the same computation will be performed. More surprising is the that the old  $\_\_calc\_delta$ can generate results that are only around 84.63\% accurate, where ours never looses accuracy beyond 99.97\%.
+When calculating the accuracy of the code in both kernel versions, we are assuming that the "ideal" value that could be calculated is the $delta\_exec * 1 / weight$ using floating point arithmetic. Since floating point operations are disabled in the kernel by default, we reimplemented all necessary kernel functions in user space and compared them against a floating point version of the ideal calculation. The results of this can be seen in both Table~\ref{tab:table1} and Table~\ref{tab:table2}. Not surprising is that our  $\_\_calc\_delta$ closely mirrors the floating point operation, as the same computation will be performed. More surprising is the that the old  $\_\_calc\_delta$ can generate results that are only around 84.63\% accurate, where ours does not degrade any lower than 99.97\%. Equally as intersting is that the accuracy of the old kernel spikes back up when using CGROUPS. This at least implies it is optimized for CGROUPS, but we couldn't find any notation that would suggest this is intentional.
 
 \subsection{Cycles}
-The total cycle counts for both kernels can be seen in Table~\ref{tab:table3} and Table~\ref{tab:table4}. It is of interesting note that while we aren't able to always outperform, our mean and standard deviation are lower which would suggest that our code produces more consistent results and on average perform better.
+The total cycle counts for both kernels can be seen in Table~\ref{tab:table3} and Table~\ref{tab:table4}. It is of interesting note that while we are not able to always outperform, our mean and standard deviation are lower which would suggest that our code produces more consistent results and on average performs better.  We can also see that the maximum cycle count for the Linux implementation is significantly higher than ours.  Though this difference is accompanied by an increase in the variance, we cannot assert that this is not influenced by any external factors outside our control.
 
 \subsection{Timing Analysis}
-To see if there was any performance perceptible at the macro level, we used hackbench as a scheduler benchmark. There were four different setups that were used for hackbench. These can be seen in Table~\ref{tab:table5} and Table~\ref{tab:table6}. Each setup was run 100 times and then the statistics were calculated based on the 100 runs.
+To see if there was any noticable performance changes at the macro level, we used hackbench as a scheduler benchmark. There were four different setups that were used for hackbench. These can be seen in Table~\ref{tab:table5} and Table~\ref{tab:table6}. Each setup was run 100 times and then the statistics were calculated based on the 100 runs. Between the two tables, there is no noticible difference between the average execution times. This appears to show that the changes in performance at the micro level do not have a noticible impact on macro level performance. 
 
 \begin{lstlisting}
 int main(void) {
@@ -232,9 +232,16 @@ int main(void) {
 	\end{tabular}}
 	\captionof{table}{Hackbench average timing results on old kernel} \label{tab:table6}
 \end{center}
-...
+
 \section{Conclusion}
-...
+
+In this paper we sought to simplify the implementation of $\_\_calc\_delta$ in $fair.c$.  Because the scheduler runs frequently, it is important that the code performs optimally.  Additionally, it is important that the code performance is consistent.  In Listing~\ref{lst:listing3}, Table~\ref{tab:table1} and Table~\ref{tab:table2} show that our implementation performs consistently regardless of the use of cgroups.
+
+Counting CPU cycles for such a relatively small piece of code is, to say the least, somewhat prone to error.  We acknowledge that the retrieval of this counter will induce an overhead.  We cannot assert how much the timing of the code at the function level is impacted by retrieving this counter.   We assert that it is more important to look at the timing measurements in aggregate, and that a statistical analysis of these measurements will be more reflective of the true performance of the code.  Our analysis shows that our implementation maintains a lower cycle count on average, a lower variance for the cpu cycle count.  We believe the most significant implication is that our implementation manages to maintain a better on-average performance, and deviates less from the mean than the implementation in the Linux kernel.  It is also interesting to note that the average performance of our implementation differs more than the kernel's implementation from using cgroups and not using cgroups.    Table~\ref{tab:table5} and Table~\ref{tab:table6} show that looking at the macro level there is no significant statistical difference between the two versions of the code.  From this, we claim that the complex implementation in the Linux kernel is unnecessary.
+
+\subsection{Additional Notes}
+We note that we observed the Linux kernel's implementation produce values above the ideal when the accuracy dropped.  We also cannot verify that there is no case where our implementation would not perform correctly.  However, after days of exploring and running countless tests, we did not observe any instability in the system caused by our changes to the scheduler. Due to astoshingly high number of issues with various machines that we had for testing we were only able to test the effects of the kernel changes on one machine.
+
 %-------------------------------------------------------------------------
 
 \nocite{*}
