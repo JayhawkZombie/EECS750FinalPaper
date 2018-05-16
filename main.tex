@@ -141,7 +141,13 @@ At the macro level two sets of data, one using CGROUPS and the other without, we
 Once we obtained the cycle counts and input data we looked at if there were any noticeable slowdowns and if the accuracy had degraded or not.
 
 \subsection{Accuracy}
-When calculating the accuracy of the code in both kernel versions, we are assuming that the "ideal" value that could be calculated is the $delta\_exec * 1 / weight$ using floating point arithmetic. Since floating point operations are disabled in the kernel by default, we reimplemented all necessary kernel functions in user space and compared them against a floating point version of the ideal calculation. The results of this can be seen in both Table~\ref{tab:table1} and Table~\ref{tab:table2}. Not surprising is that our  $\_\_calc\_delta$ closely mirrors the floating point operation, as the same computation will be performed. More surprising is the that the old  $\_\_calc\_delta$ can generate results that are only around 84.63\% accurate, where ours never loose accuracy beyond 99.97\%.
+When calculating the accuracy of the code in both kernel versions, we are assuming that the "ideal" value that could be calculated is the $delta\_exec * 1 / weight$ using floating point arithmetic. Since floating point operations are disabled in the kernel by default, we reimplemented all necessary kernel functions in user space and compared them against a floating point version of the ideal calculation. The results of this can be seen in both Table~\ref{tab:table1} and Table~\ref{tab:table2}. Not surprising is that our  $\_\_calc\_delta$ closely mirrors the floating point operation, as the same computation will be performed. More surprising is the that the old  $\_\_calc\_delta$ can generate results that are only around 84.63\% accurate, where ours never looses accuracy beyond 99.97\%.
+
+\subsection{Cycles}
+The total cycle counts for both kernels can be seen in Table~\ref{tab:table3} and Table~\ref{tab:table4}. It is of interesting note that while we aren't able to always outperform, our mean and standard deviation are lower which would suggest that our code produces more consistent results and on average perform better.
+
+\subsection{Timing Analysis}
+To see if there was any performance perceptible at the macro level, we used hackbench as a scheduler benchmark. There were four different setups that were used for hackbench. These can be seen in Table~\ref{tab:table5} and Table~\ref{tab:table6}. Each setup was run 100 times and then the statistics were calculated based on the 100 runs.
 
 \begin{lstlisting}
 int main(void) {
@@ -197,6 +203,34 @@ int main(void) {
 			\hline
 	\end{tabular}}
 	\captionof{table}{Total Cycles w/ CGROUP} \label{tab:table4}
+\end{center}
+
+\begin{center}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{| c | c | c | c | c |}
+			\hline
+			& Min & Max & STDDEV & Mean \\ \hline
+			hackbench & 0.113 & 0.156 & 0.00976 & .12828 \\ \hline
+			hackbench -p -T & 0.075 & 0.117 & 0.008319 & 0.09316 \\ \hline
+			hackbench -s 1024 -l 500 -g 30 -f 50 -P & 15.191 & 17.054 & .30808 & 15.72765\\ \hline
+			hackbench -s 1024 -l 500 -g 10 -f 50 -p -T & 6.791 & 7.756 & 0.191834 & 7.24506 \\
+			\hline
+	\end{tabular}}
+	\captionof{table}{Hackbench average timing results on new kernel} \label{tab:table5}
+\end{center}
+
+\begin{center}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{| c | c | c | c | c |}
+			\hline
+			& Min & Max & STDDEV & Mean \\ \hline
+			hackbench & 0.113 & 0.154 & 0.009195 & 0.13028 \\ \hline
+			hackbench -p -T & 0.075 & 0.119 & 0.008978 & 0.09234 \\ \hline
+			hackbench -s 1024 -l 500 -g 30 -f 50 -P & 15.132 & 16.519 & 0.230227 & 15.51134\\ \hline
+			hackbench -s 1024 -l 500 -g 10 -f 50 -p -T & 6.742 & 7.773 & 0.192186 & 7.16223 \\
+			\hline
+	\end{tabular}}
+	\captionof{table}{Hackbench average timing results on old kernel} \label{tab:table6}
 \end{center}
 ...
 \section{Conclusion}
